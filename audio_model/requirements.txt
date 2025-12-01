@@ -1,0 +1,7 @@
+# 음향 기반 드론 탐지 모델 의존성
+numpy>=1.24.0
+librosa>=0.10.0
+tensorflow>=2.13.0
+websockets>=12.0
+asyncio-mqtt>=0.16.0
+
