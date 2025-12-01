@@ -24,6 +24,14 @@ export interface Velocity3D {
   climbRate: number;
 }
 
+/** 드론 타입 */
+export type DroneType = 
+  | 'RECON_UAV' | 'ATTACK_UAV' | 'LOITER_MUNITION' 
+  | 'CARGO_UAV' | 'CIVILIAN' | 'UNKNOWN';
+
+/** 드론 크기 */
+export type DroneSize = 'SMALL' | 'MEDIUM' | 'LARGE';
+
 /** 적 드론 시뮬레이션 객체 */
 export interface HostileDrone {
   id: string;
@@ -36,6 +44,13 @@ export interface HostileDrone {
   spawnTime: number;
   lastRadarDetection: number;
   isNeutralized: boolean;
+  
+  // 확장 속성
+  is_hostile?: boolean;          // 적대성 여부
+  drone_type?: DroneType;        // 드론 타입
+  armed?: boolean;               // 무장 여부
+  size_class?: DroneSize;        // 크기 분류
+  recommended_method?: string;   // 권장 요격 방식
 }
 
 /** 요격 드론 시뮬레이션 객체 */

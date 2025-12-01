@@ -49,9 +49,12 @@ export type InterceptMethod =
 /** 요격 드론 상태 */
 export type InterceptorState = 
   | 'IDLE'          // 대기
+  | 'STANDBY'       // 대기 (레거시 호환)
   | 'SCRAMBLE'      // 출격
+  | 'LAUNCHING'     // 발진 중 (레거시 호환)
   | 'PURSUING'      // 추격
   | 'RECON'         // 정찰 모드
+  | 'ENGAGING'      // 교전 중 (레거시 호환)
   | 'INTERCEPT_RAM' // 충돌 요격 중
   | 'INTERCEPT_GUN' // 사격 요격 중
   | 'INTERCEPT_NET' // 그물 요격 중

@@ -24,21 +24,36 @@ export type HostileDroneBehavior =
   | 'ATTACK_RUN' // 저고도 급접근
   | 'EVADE';     // 회피 기동
 
-/** 요격 드론 상태 */
+/** 요격 드론 상태 (확장) */
 export type InterceptorState = 
-  | 'STANDBY'    // 대기
-  | 'LAUNCHING'  // 발진 중
-  | 'PURSUING'   // 추격 중
-  | 'ENGAGING'   // 교전 중
-  | 'RETURNING'  // 귀환 중
-  | 'NEUTRALIZED'; // 무력화
+  | 'IDLE'          // 대기
+  | 'STANDBY'       // 대기 (호환성)
+  | 'SCRAMBLE'      // 출격
+  | 'LAUNCHING'     // 발진 중
+  | 'PURSUING'      // 추격 중
+  | 'RECON'         // 정찰 모드
+  | 'ENGAGING'      // 교전 중 (호환성)
+  | 'INTERCEPT_RAM' // 충돌 요격 중
+  | 'INTERCEPT_GUN' // 사격 요격 중
+  | 'INTERCEPT_NET' // 그물 요격 중
+  | 'INTERCEPT_JAM' // 재밍 요격 중
+  | 'RETURNING'     // 귀환 중
+  | 'NEUTRALIZED';  // 무력화
 
-/** 교전 방법 */
+/** 요격 방식 */
+export type InterceptMethod = 
+  | 'RAM'   // 충돌 요격
+  | 'GUN'   // 사격 요격
+  | 'NET'   // 그물 요격
+  | 'JAM';  // 전자전 재밍
+
+/** 교전 방법 (레거시 호환성) */
 export type EngagementMethod = 
   | 'interceptor_drone'  // 요격 드론
   | 'jamming'            // 전파 교란
   | 'net_gun'            // 그물총
-  | 'kinetic';           // 물리적 충돌
+  | 'kinetic'            // 물리적 충돌
+  | InterceptMethod;     // 새 요격 방식
 
 /** 요격 결과 */
 export type InterceptResult = 
@@ -95,6 +110,8 @@ export interface InterceptorUpdateEvent {
   state: InterceptorState;
   position: { x: number; y: number; altitude: number };
   distance_to_target?: number;
+  method?: InterceptMethod;      // 요격 방식
+  eo_confirmed?: boolean;        // EO 정찰 완료 여부
 }
 
 /** 요격 결과 이벤트 */
@@ -125,7 +142,7 @@ export interface SimulationStatusEvent {
 export interface EngageCommand {
   type: 'engage_command';
   drone_id: string;
-  method: EngagementMethod;
+  method: EngagementMethod | InterceptMethod;
   interceptor_id?: string;  // 특정 요격기 지정
 }
 

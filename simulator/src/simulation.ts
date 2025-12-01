@@ -21,7 +21,7 @@ import {
 import { SimulationWorld, HostileDrone, InterceptorDrone, Position3D } from './types';
 import { RadarSensor } from './sensors/radar';
 import { createHostileDrone, updateHostileDrone, setDroneBehavior } from './models/hostileDrone';
-import { createInterceptor, updateInterceptor, launchInterceptor, resetInterceptor } from './models/interceptor';
+import { createInterceptor, updateInterceptor, launchInterceptor, resetInterceptor, ExtendedInterceptorDrone } from './models/interceptor';
 import { getLogger, ExperimentLogger } from './core/logging/logger';
 import { GeneratedScenario, getGenerator } from './core/scenario/generator';
 import * as LogEvents from './core/logging/eventSchemas';
@@ -383,14 +383,14 @@ export class SimulationEngine {
         : null;
 
       const { interceptor: updated, interceptResult } = updateInterceptor(
-        interceptor,
+        interceptor as ExtendedInterceptorDrone,
         deltaTime,
         target,
         this.world.basePosition,
         this.world.time
       );
 
-      this.world.interceptors.set(id, updated);
+      this.world.interceptors.set(id, updated as InterceptorDrone);
 
       if (interceptResult) {
         this.handleInterceptResult(updated, target!, interceptResult);
@@ -429,7 +429,7 @@ export class SimulationEngine {
    * 요격 결과 처리
    */
   private handleInterceptResult(
-    interceptor: InterceptorDrone,
+    interceptor: ExtendedInterceptorDrone,
     target: HostileDrone,
     result: string
   ): void {
@@ -451,13 +451,20 @@ export class SimulationEngine {
     this.onEvent(event);
 
     // 요격 결과 로깅
+    const reasonMap: Record<string, LogEvents.InterceptFailureReason | undefined> = {
+      '요격 성공': undefined,
+      '타겟 회피': 'evaded',
+      '요격 실패': 'target_lost',
+      '요격 중단': 'timeout',
+    };
     this.logger.log({
       timestamp: this.world.time,
       event: 'intercept_result',
       interceptor_id: interceptor.id,
       target_id: target.id,
+      method: interceptor.method || 'RAM',
       result: result.toLowerCase() as 'success' | 'miss' | 'evaded' | 'aborted',
-      reason: event.details,
+      reason: reasonMap[event.details || ''] as LogEvents.InterceptFailureReason,
       engagement_duration: interceptor.launchTime 
         ? this.world.time - interceptor.launchTime 
         : 0,
@@ -498,7 +505,7 @@ export class SimulationEngine {
   /**
    * 요격 드론 상태 이벤트 발생
    */
-  private emitInterceptorEvent(interceptor: InterceptorDrone): void {
+  private emitInterceptorEvent(interceptor: ExtendedInterceptorDrone): void {
     const target = interceptor.targetId 
       ? this.world.hostileDrones.get(interceptor.targetId)
       : null;
@@ -508,7 +515,7 @@ export class SimulationEngine {
       timestamp: this.world.time,
       interceptor_id: interceptor.id,
       target_id: interceptor.targetId,
-      state: interceptor.state,
+      state: interceptor.state as any, // 상태 타입 호환성
       position: interceptor.position,
       distance_to_target: target 
         ? Math.sqrt(
@@ -516,6 +523,8 @@ export class SimulationEngine {
             (interceptor.position.y - target.position.y) ** 2
           )
         : undefined,
+      method: interceptor.method,
+      eo_confirmed: interceptor.eoConfirmed,
     };
     this.onEvent(event);
   }
@@ -542,33 +551,41 @@ export class SimulationEngine {
   /**
    * 요격 명령 처리
    */
-  handleEngageCommand(droneId: string, interceptorId?: string, issuedBy: 'user' | 'auto' = 'user'): boolean {
+  handleEngageCommand(
+    droneId: string, 
+    interceptorId?: string, 
+    issuedBy: 'user' | 'auto' = 'user',
+    method: LogEvents.InterceptMethod = 'RAM'
+  ): boolean {
     const target = this.world.hostileDrones.get(droneId);
     if (!target || target.isNeutralized) return false;
 
-    let interceptor: InterceptorDrone | undefined;
+    let interceptor: ExtendedInterceptorDrone | undefined;
     
     if (interceptorId) {
-      interceptor = this.world.interceptors.get(interceptorId);
+      interceptor = this.world.interceptors.get(interceptorId) as ExtendedInterceptorDrone;
     } else {
       this.world.interceptors.forEach((int) => {
-        if (int.state === 'STANDBY' && !interceptor) {
-          interceptor = int;
+        const state = (int as ExtendedInterceptorDrone).state;
+        if ((state === 'IDLE' || state === 'STANDBY') && !interceptor) {
+          interceptor = int as ExtendedInterceptorDrone;
         }
       });
     }
 
-    if (!interceptor || interceptor.state !== 'STANDBY') return false;
+    if (!interceptor) return false;
+    const state = interceptor.state;
+    if (state !== 'IDLE' && state !== 'STANDBY') return false;
 
-    const launched = launchInterceptor(interceptor, droneId, this.world.time);
-    this.world.interceptors.set(launched.id, launched);
+    const launched = launchInterceptor(interceptor, droneId, this.world.time, method);
+    this.world.interceptors.set(launched.id, launched as InterceptorDrone);
 
     // 교전 명령 로깅
     this.logger.log({
       timestamp: this.world.time,
       event: 'engage_command',
       drone_id: droneId,
-      method: 'interceptor_drone',
+      method: method,
       interceptor_id: launched.id,
       issued_by: issuedBy,
     });

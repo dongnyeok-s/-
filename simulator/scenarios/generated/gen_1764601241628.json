@@ -1,0 +1,421 @@
+{
+  "id": "gen_1764601241628",
+  "name": "자동생성 시나리오 (12기)",
+  "seed": 1764601241628,
+  "created_at": "2025-12-01T15:00:41.629Z",
+  "drones": [
+    {
+      "id": "DRONE-A",
+      "position": {
+        "x": 622.8121890890222,
+        "y": 421.75008619876843,
+        "altitude": 170.287163304165
+      },
+      "velocity": {
+        "vx": -3.5431577931401677,
+        "vy": 5.2322973572397595,
+        "climbRate": -1.3079243395477533
+      },
+      "behavior": "RECON",
+      "is_hostile": true,
+      "drone_type": "RECON_UAV",
+      "armed": false,
+      "size_class": "MEDIUM",
+      "recommended_method": "NET",
+      "config": {
+        "max_speed": 22.332041585817933,
+        "cruise_speed": 12.63818068895489,
+        "acceleration": 3.2550532950554043,
+        "turn_rate": 49.33693727245554,
+        "climb_rate": 7.483036644523963,
+        "evasion_trigger_distance": 131.96123441914096,
+        "evasion_maneuver_strength": 0.8015575940953568
+      },
+      "target_position": {
+        "x": 102.52436315640807,
+        "y": 33.88999551534653,
+        "altitude": 137.20518700778484
+      }
+    },
+    {
+      "id": "DRONE-B",
+      "position": {
+        "x": -299.42559728761995,
+        "y": -189.74055077251023,
+        "altitude": 155.7520779198967
+      },
+      "velocity": {
+        "vx": -10.73473683223455,
+        "vy": 5.03641554367102,
+        "climbRate": -1.2632020022720098
+      },
+      "behavior": "EVADE",
+      "is_hostile": true,
+      "drone_type": "UNKNOWN",
+      "armed": false,
+      "size_class": "MEDIUM",
+      "recommended_method": "GUN",
+      "config": {
+        "max_speed": 25.478212727466598,
+        "cruise_speed": 11.857489463873208,
+        "acceleration": 6.739316731924191,
+        "turn_rate": 108.34998534293845,
+        "climb_rate": 7.297497820807621,
+        "evasion_trigger_distance": 120.74456305243075,
+        "evasion_maneuver_strength": 0.8156992533477023
+      }
+    },
+    {
+      "id": "DRONE-C",
+      "position": {
+        "x": -129.33620155541604,
+        "y": -419.49960536988993,
+        "altitude": 59.34307663701475
+      },
+      "velocity": {
+        "vx": 2.769232300191836,
+        "vy": -0.8537838471041554,
+        "climbRate": -1.6853893492370844
+      },
+      "behavior": "RECON",
+      "is_hostile": false,
+      "drone_type": "CARGO_UAV",
+      "armed": false,
+      "size_class": "LARGE",
+      "recommended_method": null,
+      "config": {
+        "max_speed": 15.363124345662072,
+        "cruise_speed": 5.7957206247374415,
+        "acceleration": 4.538742151344195,
+        "turn_rate": 47.20363707630895,
+        "climb_rate": 3.8072273957077414,
+        "evasion_trigger_distance": 110.15938274329528,
+        "evasion_maneuver_strength": 0.7429285839898512
+      },
+      "target_position": {
+        "x": 42.56707476451993,
+        "y": 31.174782291054726,
+        "altitude": 142.7145655825734
+      }
+    },
+    {
+      "id": "DRONE-D",
+      "position": {
+        "x": -35.40835488006581,
+        "y": 652.1931728730484,
+        "altitude": 121.83769908966497
+      },
+      "velocity": {
+        "vx": 4.964546859326509,
+        "vy": 15.589797768445722,
+        "climbRate": 0.5129085369408131
+      },
+      "behavior": "EVADE",
+      "is_hostile": true,
+      "drone_type": "UNKNOWN",
+      "armed": false,
+      "size_class": "LARGE",
+      "recommended_method": "GUN",
+      "config": {
+        "max_speed": 25.893118483945727,
+        "cruise_speed": 16.361189442686737,
+        "acceleration": 7.233641932485625,
+        "turn_rate": 88.32087438669987,
+        "climb_rate": 5.967821840429679,
+        "evasion_trigger_distance": 135.2314510801807,
+        "evasion_maneuver_strength": 0.6549496982479468
+      }
+    },
+    {
+      "id": "DRONE-E",
+      "position": {
+        "x": 344.88826428678163,
+        "y": 162.98428856335562,
+        "altitude": 167.2504262230359
+      },
+      "velocity": {
+        "vx": -18.498569223765756,
+        "vy": -8.741892539052685,
+        "climbRate": 0.07271560747176409
+      },
+      "behavior": "NORMAL",
+      "is_hostile": false,
+      "drone_type": "UNKNOWN",
+      "armed": true,
+      "size_class": "LARGE",
+      "recommended_method": null,
+      "config": {
+        "max_speed": 25.78859388595447,
+        "cruise_speed": 20.460150255821645,
+        "acceleration": 8.305294781923294,
+        "turn_rate": 72.6732683298178,
+        "climb_rate": 4.581985198426992,
+        "evasion_trigger_distance": 116.6585168754682,
+        "evasion_maneuver_strength": 0.511170644313097
+      }
+    },
+    {
+      "id": "DRONE-F",
+      "position": {
+        "x": 364.5548502951752,
+        "y": 447.29773116462314,
+        "altitude": 76.98533141054213
+      },
+      "velocity": {
+        "vx": -4.921410807162287,
+        "vy": 4.011029019473825,
+        "climbRate": 1.2222968935966492
+      },
+      "behavior": "RECON",
+      "is_hostile": false,
+      "drone_type": "RECON_UAV",
+      "armed": false,
+      "size_class": "MEDIUM",
+      "recommended_method": null,
+      "config": {
+        "max_speed": 20.89930979348719,
+        "cruise_speed": 12.69781684037298,
+        "acceleration": 8.197941550519317,
+        "turn_rate": 84.8285465722438,
+        "climb_rate": 6.6703862773720175,
+        "evasion_trigger_distance": 149.5780914183706,
+        "evasion_maneuver_strength": 0.5811578930588439
+      },
+      "target_position": {
+        "x": -102.71104192361236,
+        "y": -74.52736422419548,
+        "altitude": 143.27971927821636
+      }
+    },
+    {
+      "id": "DRONE-G",
+      "position": {
+        "x": 476.6212239644356,
+        "y": 175.6621384253261,
+        "altitude": 112.04402449773625
+      },
+      "velocity": {
+        "vx": -1.1810703810952992,
+        "vy": 3.2045790610996248,
+        "climbRate": 0.05943564046174288
+      },
+      "behavior": "RECON",
+      "is_hostile": false,
+      "drone_type": "CIVILIAN",
+      "armed": false,
+      "size_class": "SMALL",
+      "recommended_method": null,
+      "config": {
+        "max_speed": 12.480033125169575,
+        "cruise_speed": 6.8305941773578525,
+        "acceleration": 9.915918583516032,
+        "turn_rate": 76.43620896153152,
+        "climb_rate": 6.32584593212232,
+        "evasion_trigger_distance": 93.89373022364452,
+        "evasion_maneuver_strength": 0.8126759193837643
+      },
+      "target_position": {
+        "x": 82.03008761629462,
+        "y": -75.07789013907313,
+        "altitude": 127.1019447222352
+      }
+    },
+    {
+      "id": "DRONE-H",
+      "position": {
+        "x": 299.7051822598241,
+        "y": -643.6282148072264,
+        "altitude": 144.87615165533498
+      },
+      "velocity": {
+        "vx": 6.847693475318299,
+        "vy": 3.188625317947508,
+        "climbRate": -1.4742867508903146
+      },
+      "behavior": "RECON",
+      "is_hostile": false,
+      "drone_type": "ATTACK_UAV",
+      "armed": true,
+      "size_class": "LARGE",
+      "recommended_method": null,
+      "config": {
+        "max_speed": 41.84748786827549,
+        "cruise_speed": 15.10738062672317,
+        "acceleration": 5.194204882485792,
+        "turn_rate": 67.04929633880965,
+        "climb_rate": 3.1868274190928787,
+        "evasion_trigger_distance": 127.28317877277732,
+        "evasion_maneuver_strength": 0.803740439703688
+      },
+      "target_position": {
+        "x": -133.03336687386036,
+        "y": -142.3093942925334,
+        "altitude": 147.62389078736305
+      }
+    },
+    {
+      "id": "DRONE-I",
+      "position": {
+        "x": -25.187106798994794,
+        "y": -344.6338902786019,
+        "altitude": 89.86234485171735
+      },
+      "velocity": {
+        "vx": 1.2188581324667371,
+        "vy": 16.677573301372092,
+        "climbRate": 1.7110610790550709
+      },
+      "behavior": "NORMAL",
+      "is_hostile": true,
+      "drone_type": "RECON_UAV",
+      "armed": false,
+      "size_class": "MEDIUM",
+      "recommended_method": "NET",
+      "config": {
+        "max_speed": 23.83680837135762,
+        "cruise_speed": 16.722053294070065,
+        "acceleration": 7.153347204206511,
+        "turn_rate": 89.36903169262223,
+        "climb_rate": 7.121668097795919,
+        "evasion_trigger_distance": 130.60824838932604,
+        "evasion_maneuver_strength": 0.9404616066021845
+      }
+    },
+    {
+      "id": "DRONE-J",
+      "position": {
+        "x": -82.25204272175074,
+        "y": -487.1625862391813,
+        "altitude": 153.40895320521668
+      },
+      "velocity": {
+        "vx": 8.125452366539838,
+        "vy": -1.371893232494776,
+        "climbRate": 1.5592369344085455
+      },
+      "behavior": "RECON",
+      "is_hostile": true,
+      "drone_type": "LOITER_MUNITION",
+      "armed": true,
+      "size_class": "MEDIUM",
+      "recommended_method": "GUN",
+      "config": {
+        "max_speed": 26.481565944850445,
+        "cruise_speed": 16.480906188953668,
+        "acceleration": 7.643715764395893,
+        "turn_rate": 101.91303735366091,
+        "climb_rate": 3.5776548315770924,
+        "evasion_trigger_distance": 113.59980785986409,
+        "evasion_maneuver_strength": 0.9942540324991569
+      },
+      "target_position": {
+        "x": -69.78021636605263,
+        "y": -155.59439165517688,
+        "altitude": 109.46811284869909
+      }
+    },
+    {
+      "id": "DRONE-K",
+      "position": {
+        "x": 424.7492889117304,
+        "y": 367.1312590791955,
+        "altitude": 106.67134332703426
+      },
+      "velocity": {
+        "vx": 13.313977744053421,
+        "vy": 14.532633975142792,
+        "climbRate": -1.0740210879594088
+      },
+      "behavior": "EVADE",
+      "is_hostile": true,
+      "drone_type": "LOITER_MUNITION",
+      "armed": true,
+      "size_class": "SMALL",
+      "recommended_method": "JAM",
+      "config": {
+        "max_speed": 26.67034605401568,
+        "cruise_speed": 19.709374764934182,
+        "acceleration": 9.455033757258207,
+        "turn_rate": 102.91423267219216,
+        "climb_rate": 6.580105418805033,
+        "evasion_trigger_distance": 112.96559651149437,
+        "evasion_maneuver_strength": 0.7876360639929771
+      }
+    },
+    {
+      "id": "DRONE-L",
+      "position": {
+        "x": 334.20293695509423,
+        "y": 133.7694251218029,
+        "altitude": 109.07751394202933
+      },
+      "velocity": {
+        "vx": -1.8663092093396367,
+        "vy": 4.662694920455228,
+        "climbRate": 0.17515851370990276
+      },
+      "behavior": "RECON",
+      "is_hostile": true,
+      "drone_type": "RECON_UAV",
+      "armed": false,
+      "size_class": "MEDIUM",
+      "recommended_method": "JAM",
+      "config": {
+        "max_speed": 21.426354167051613,
+        "cruise_speed": 10.044667039997876,
+        "acceleration": 6.22801777604036,
+        "turn_rate": 57.2649482160341,
+        "climb_rate": 7.826404781779274,
+        "evasion_trigger_distance": 135.35254734102637,
+        "evasion_maneuver_strength": 0.8066508860792965
+      },
+      "target_position": {
+        "x": 114.7822237573564,
+        "y": -49.4739587418735,
+        "altitude": 165.76210793107748
+      }
+    }
+  ],
+  "interceptor_count": 1,
+  "radar_config": {
+    "scan_rate": 0.621649727341719,
+    "max_range": 1079,
+    "radial_noise_sigma": 19.43923175567761,
+    "azimuth_noise_sigma": 4.320909249596298,
+    "false_alarm_rate": 0.012869801943888887,
+    "miss_probability": 0.11434326320886612
+  },
+  "acoustic_config": {
+    "enabled": false,
+    "detection_range": 712,
+    "takeoff_boost": 0.2982140068896115,
+    "approach_boost": 0.29823333234526217,
+    "false_alarm_rate": 0.014683700548484922,
+    "miss_probability": 0.2820896196644753
+  },
+  "behavior_distribution": {
+    "direct_attack": 0.3470720218021225,
+    "recon_loiter": 0.27648453267343454,
+    "evasive": 0.17375270166424928,
+    "random_walk": 0.20269074386019367
+  },
+  "metadata": {
+    "hostile_ratio": 0.5833333333333334,
+    "armed_ratio": 0.3333333333333333,
+    "avg_initial_distance": 511,
+    "difficulty_estimate": 7,
+    "drone_type_distribution": {
+      "RECON_UAV": 4,
+      "ATTACK_UAV": 1,
+      "LOITER_MUNITION": 2,
+      "CARGO_UAV": 1,
+      "CIVILIAN": 1,
+      "UNKNOWN": 3
+    },
+    "size_distribution": {
+      "SMALL": 2,
+      "MEDIUM": 6,
+      "LARGE": 4
+    }
+  }
+}
