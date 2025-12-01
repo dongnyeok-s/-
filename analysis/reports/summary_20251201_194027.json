@@ -1,0 +1,309 @@
+{
+  "generated_at": "2025-12-01T19:40:27.805518",
+  "metrics": {
+    "experiment_count": 17,
+    "audio_enabled_experiments": 0,
+    "drones": {
+      "total": 98,
+      "hostile": 98,
+      "neutral": 0,
+      "detected": 39,
+      "engaged": 9,
+      "neutralized": 4,
+      "avg_per_experiment": 5.8,
+      "per_experiment_distribution": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        2,
+        9,
+        4,
+        1,
+        12,
+        2,
+        7,
+        6,
+        10,
+        13,
+        7,
+        10
+      ]
+    },
+    "detection": {
+      "total_radar": 2740,
+      "total_audio": 0,
+      "audio_model_active": false,
+      "false_alarm_total": 13,
+      "false_alarm_breakdown": {
+        "no_object": 13,
+        "misclassification": 0,
+        "tracking_error": 0
+      },
+      "false_alarm_rate": 0.47,
+      "detection_delay": {
+        "mean": 1.215,
+        "median": 1.2,
+        "std": 0.429,
+        "min_val": 0.8,
+        "max_val": 2.6,
+        "count": 39,
+        "values": [
+          1.0999999999999999,
+          1.0999999999999999,
+          1.0999999999999999,
+          1.0999999999999999,
+          1.0999999999999999,
+          1.0999999999999999,
+          0.9999999999999999,
+          0.9999999999999999,
+          1.5000000000000002,
+          1.5000000000000002,
+          1.5000000000000002,
+          1.5000000000000002,
+          1.3,
+          1.3,
+          1.3,
+          1.3,
+          1.3,
+          1.3,
+          2.600000000000001,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          1.2,
+          2.400000000000001,
+          2.400000000000001,
+          0.7999999999999999,
+          0.7999999999999999,
+          0.7999999999999999,
+          0.7999999999999999,
+          0.7999999999999999,
+          0.7999999999999999,
+          0.7999999999999999,
+          0.7999999999999999,
+          0.7999999999999999,
+          0.7999999999999999
+        ]
+      }
+    },
+    "engagement": {
+      "total_commands": 15,
+      "engaged_ratio": 9.18,
+      "engagement_delay": {
+        "mean": 7.138,
+        "median": 3.45,
+        "std": 8.283,
+        "min_val": 0.8,
+        "max_val": 22.8,
+        "count": 8,
+        "values": [
+          4.999999999999995,
+          3.0,
+          3.8999999999999977,
+          2.400000000000002,
+          22.80000000000007,
+          0.8000000000000004,
+          1.600000000000001,
+          17.59999999999999
+        ]
+      }
+    },
+    "interception": {
+      "total_attempts": 10,
+      "successes": 4,
+      "failures": 6,
+      "success_rate": 40.0,
+      "neutralization_rate": 4.08,
+      "failure_reasons": {
+        "evaded": 0,
+        "distance_exceeded": 0,
+        "timeout": 0,
+        "low_speed": 0,
+        "sensor_error": 0,
+        "target_lost": 0,
+        "other": 6
+      },
+      "top_failure_reasons": [
+        [
+          "other",
+          6
+        ],
+        [
+          "evaded",
+          0
+        ],
+        [
+          "distance_exceeded",
+          0
+        ]
+      ]
+    },
+    "event_totals": {
+      "scenario_start": 17,
+      "drone_spawned": 98,
+      "manual_action": 25,
+      "scenario_end": 10,
+      "simulation_control": 34,
+      "radar_detection": 2740,
+      "track_update": 1570,
+      "engage_command": 15,
+      "interceptor_spawned": 15,
+      "evade_start": 9,
+      "intercept_result": 10,
+      "evade_end": 4
+    }
+  },
+  "individual_experiments": [
+    {
+      "id": "1",
+      "scenario_id": "1",
+      "duration": 0,
+      "drone_count": 3,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "1",
+      "scenario_id": "1",
+      "duration": 0,
+      "drone_count": 3,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "1",
+      "scenario_id": "1",
+      "duration": 0,
+      "drone_count": 3,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "1",
+      "scenario_id": "1",
+      "duration": 74.90000000000002,
+      "drone_count": 3,
+      "radar_detections": 208,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "1",
+      "scenario_id": "1",
+      "duration": 0,
+      "drone_count": 3,
+      "radar_detections": 1797,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "gen_17281",
+      "scenario_id": "gen_17281",
+      "duration": 0,
+      "drone_count": 2,
+      "radar_detections": 43,
+      "intercept_success_rate": 100.0
+    },
+    {
+      "id": "gen_1764582814104",
+      "scenario_id": "gen_1764582814104",
+      "duration": 0,
+      "drone_count": 9,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "gen_21254",
+      "scenario_id": "gen_21254",
+      "duration": 0,
+      "drone_count": 4,
+      "radar_detections": 66,
+      "intercept_success_rate": 50.0
+    },
+    {
+      "id": "gen_34315",
+      "scenario_id": "gen_34315",
+      "duration": 0,
+      "drone_count": 1,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "gen_39680",
+      "scenario_id": "gen_39680",
+      "duration": 0,
+      "drone_count": 12,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "gen_4340",
+      "scenario_id": "gen_4340",
+      "duration": 0,
+      "drone_count": 2,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "gen_48117",
+      "scenario_id": "gen_48117",
+      "duration": 0,
+      "drone_count": 7,
+      "radar_detections": 133,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "gen_49161",
+      "scenario_id": "gen_49161",
+      "duration": 0,
+      "drone_count": 6,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "gen_56057",
+      "scenario_id": "gen_56057",
+      "duration": 0,
+      "drone_count": 10,
+      "radar_detections": 196,
+      "intercept_success_rate": 25.0
+    },
+    {
+      "id": "gen_66190",
+      "scenario_id": "gen_66190",
+      "duration": 0,
+      "drone_count": 13,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "gen_94435",
+      "scenario_id": "gen_94435",
+      "duration": 0,
+      "drone_count": 7,
+      "radar_detections": 0,
+      "intercept_success_rate": 0
+    },
+    {
+      "id": "gen_94498",
+      "scenario_id": "gen_94498",
+      "duration": 0,
+      "drone_count": 10,
+      "radar_detections": 297,
+      "intercept_success_rate": 33.33333333333333
+    }
+  ],
+  "improvement_points": [
+    "⚠️ 요격 성공률(40.0%)이 낮음 - 요격 알고리즘 개선 필요",
+    "✅ 오탐률(0.47%) 양호",
+    "✅ 탐지 지연(1.22초) 양호",
+    "⚠️ 교전 비율(9.18%)이 낮음 - 교전 판단 기준 완화 검토",
+    "📈 주요 요격 실패 원인: other (6회)",
+    "⚠️ 무력화율(4.08%)이 낮음 - 전체적인 대응 능력 검토 필요",
+    "ℹ️ 음향 탐지 모델이 비활성화 상태임"
+  ]
+}

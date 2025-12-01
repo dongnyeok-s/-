@@ -103,7 +103,13 @@ export function updateHostileDrone(
       updatedDrone = updateAttackRunBehavior(updatedDrone, deltaTime, basePosition);
       break;
     case 'EVADE':
-      updatedDrone = updateEvadeBehavior(updatedDrone, deltaTime, nearestInterceptor!);
+      if (nearestInterceptor) {
+        updatedDrone = updateEvadeBehavior(updatedDrone, deltaTime, nearestInterceptor);
+      } else {
+        // 요격 드론이 없으면 NORMAL 행동으로 대체
+        updatedDrone = updateNormalBehavior(updatedDrone, deltaTime, basePosition);
+        updatedDrone.isEvading = false;
+      }
       break;
   }
 

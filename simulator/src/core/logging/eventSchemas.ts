@@ -35,6 +35,8 @@ export interface ScenarioStartEvent extends BaseEvent {
       miss_probability: number;
     };
     behavior_distribution?: Record<string, number>;
+    audio_model_enabled?: boolean;  // 음향 모델 활성화 여부
+    hostile_ratio?: number;         // 적대적 드론 비율
   };
 }
 
@@ -90,6 +92,12 @@ export interface AudioDetectionEvent extends BaseEvent {
   is_first_detection: boolean;
 }
 
+/** 오탐 유형 */
+export type FalseAlarmType = 
+  | 'no_object'          // 드론 없음 + 탐지 이벤트 발생
+  | 'misclassification'  // 아군/중립 드론을 적으로 분류
+  | 'tracking_error';    // 위치/거리 오차가 threshold 초과
+
 export interface RadarDetectionEvent extends BaseEvent {
   event: 'radar_detection';
   drone_id: string;
@@ -99,6 +107,8 @@ export interface RadarDetectionEvent extends BaseEvent {
   radial_velocity?: number;
   confidence: number;
   is_false_alarm: boolean;
+  false_alarm_type?: FalseAlarmType;  // 오탐 유형
+  tracking_error?: number;            // 실제 위치와의 오차 (m)
   is_first_detection: boolean;
 }
 
@@ -150,13 +160,26 @@ export interface InterceptAttemptEvent extends BaseEvent {
   success_probability: number;
 }
 
+/** 요격 실패 원인 */
+export type InterceptFailureReason = 
+  | 'evaded'            // 타겟이 회피 성공
+  | 'distance_exceeded' // 최대 추적 거리 초과
+  | 'timeout'           // 교전 시간 초과
+  | 'low_speed'         // 요격기 속도 부족
+  | 'sensor_error'      // 센서 오류로 타겟 손실
+  | 'fuel_depleted'     // 연료/배터리 소진
+  | 'target_lost';      // 타겟 추적 실패
+
 export interface InterceptResultEvent extends BaseEvent {
   event: 'intercept_result';
   interceptor_id: string;
   target_id: string;
   result: 'success' | 'miss' | 'evaded' | 'aborted';
-  reason?: string;
+  reason?: InterceptFailureReason;    // 실패 원인 (실패 시)
   engagement_duration: number;
+  final_distance?: number;            // 최종 거리
+  target_was_evading?: boolean;       // 타겟 회피 여부
+  relative_speed_at_intercept?: number; // 요격 시점 상대속도
 }
 
 // ============================================

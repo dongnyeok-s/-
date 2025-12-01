@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대드론 C2 시뮬레이션 실험 보고서</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Apple SD Gothic Neo', sans-serif; 
+            line-height: 1.6; 
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .report-container { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; }
+        h2 { color: #34495e; margin: 25px 0 15px; padding-left: 10px; border-left: 4px solid #3498db; }
+        .meta { color: #7f8c8d; font-size: 0.9em; margin-bottom: 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-card.success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .stat-card.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .stat-card.info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .stat-value { font-size: 2.5em; font-weight: bold; }
+        .stat-label { font-size: 0.9em; opacity: 0.9; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #2c3e50; color: white; }
+        tr:hover { background: #f8f9fa; }
+        .improvement { 
+            background: #fff3cd; 
+            border-left: 4px solid #ffc107; 
+            padding: 10px 15px; 
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .improvement.success { background: #d4edda; border-color: #28a745; }
+        .improvement.danger { background: #f8d7da; border-color: #dc3545; }
+        .chart-container { text-align: center; margin: 30px 0; }
+        .chart-container img { max-width: 100%; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .footer { text-align: center; color: #7f8c8d; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <h1>🛡️ 대드론 C2 시뮬레이션 실험 보고서</h1>
+        <div class="meta">
+            <p>📅 생성 시간: 2025-12-01T19:40:27.805518</p>
+            <p>📊 분석 실험 수: 17회</p>
+        </div>
+        
+        <h2>1. 실험 개요</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">17</div>
+                <div class="stat-label">총 실험 횟수</div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-value">98</div>
+                <div class="stat-label">총 드론 수</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">98</div>
+                <div class="stat-label">적대적 드론</div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-value">5.8</div>
+                <div class="stat-label">평균 드론/실험</div>
+            </div>
+        </div>
+        
+        <h2>2. 탐지 성능</h2>
+        <div class="stats-grid">
+            <div class="stat-card info">
+                <div class="stat-value">2,740</div>
+                <div class="stat-label">레이더 탐지</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value">0</div>
+                <div class="stat-label">음향 탐지 (비활성)</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value">0.47%</div>
+                <div class="stat-label">오탐률</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1.22s</div>
+                <div class="stat-label">평균 탐지 지연</div>
+            </div>
+        </div>
+        
+        <h3>오탐 유형 분류</h3>
+        <table>
+            <tr><th>유형</th><th>횟수</th><th>설명</th></tr>
+            <tr><td>객체 없음</td><td>13</td><td>실제 드론이 없는데 탐지됨</td></tr>
+            <tr><td>오분류</td><td>0</td><td>아군/중립을 적으로 분류</td></tr>
+            <tr><td>추적 오류</td><td>0</td><td>위치 오차 임계값 초과</td></tr>
+        </table>
+        
+        <h3>탐지 지연 상세 통계</h3>
+        <table>
+            <tr><th>지표</th><th>탐지 지연</th><th>교전 지연</th></tr>
+            <tr><td>평균</td><td>1.215초</td><td>7.138초</td></tr>
+            <tr><td>중앙값</td><td>1.200초</td><td>3.450초</td></tr>
+            <tr><td>표준편차</td><td>0.429초</td><td>8.283초</td></tr>
+            <tr><td>최소</td><td>0.800초</td><td>0.800초</td></tr>
+            <tr><td>최대</td><td>2.600초</td><td>22.800초</td></tr>
+        </table>
+        
+        <h2>3. 교전 효율</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">15</div>
+                <div class="stat-label">교전 명령</div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-value">9.18%</div>
+                <div class="stat-label">교전 비율</div>
+            </div>
+        </div>
+        
+        <h2>4. 요격 성능</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">10</div>
+                <div class="stat-label">요격 시도</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-value">4</div>
+                <div class="stat-label">요격 성공</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value">6</div>
+                <div class="stat-label">요격 실패</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value">40.0%</div>
+                <div class="stat-label">성공률</div>
+            </div>
+        </div>
+        
+        <h3>요격 실패 원인 분석</h3>
+        <table>
+            <tr><th>원인</th><th>횟수</th></tr>
+            <tr><td>other</td><td>6</td></tr>
+        </table>
+        
+        <h2>5. 드론 상태 요약</h2>
+        <div class="stats-grid">
+            <div class="stat-card info">
+                <div class="stat-value">39</div>
+                <div class="stat-label">탐지됨</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">9</div>
+                <div class="stat-label">교전됨</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-value">4</div>
+                <div class="stat-label">무력화</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-value">4.08%</div>
+                <div class="stat-label">무력화율</div>
+            </div>
+        </div>
+        
+        <h2>6. 이벤트 총계</h2>
+        <table>
+            <tr><th>이벤트 유형</th><th>발생 횟수</th></tr>
+            <tr><td>radar_detection</td><td>2,740</td></tr><tr><td>track_update</td><td>1,570</td></tr><tr><td>drone_spawned</td><td>98</td></tr><tr><td>simulation_control</td><td>34</td></tr><tr><td>manual_action</td><td>25</td></tr><tr><td>scenario_start</td><td>17</td></tr><tr><td>engage_command</td><td>15</td></tr><tr><td>interceptor_spawned</td><td>15</td></tr><tr><td>scenario_end</td><td>10</td></tr><tr><td>intercept_result</td><td>10</td></tr>
+        </table>
+        
+        <h2>7. 개선 포인트</h2>
+        <div class="improvement danger">⚠️ 요격 성공률(40.0%)이 낮음 - 요격 알고리즘 개선 필요</div><div class="improvement success">✅ 오탐률(0.47%) 양호</div><div class="improvement success">✅ 탐지 지연(1.22초) 양호</div><div class="improvement danger">⚠️ 교전 비율(9.18%)이 낮음 - 교전 판단 기준 완화 검토</div><div class="improvement ">📈 주요 요격 실패 원인: other (6회)</div><div class="improvement danger">⚠️ 무력화율(4.08%)이 낮음 - 전체적인 대응 능력 검토 필요</div><div class="improvement ">ℹ️ 음향 탐지 모델이 비활성화 상태임</div>
+        
+        <div class="chart-container">
+            <h2>8. 시각화</h2>
+            <img src="experiment_analysis.png" alt="분석 그래프" onerror="this.style.display='none'">
+        </div>
+        
+        <div class="footer">
+            <p>🛡️ 대드론 C2 시뮬레이터 자동 분석 보고서</p>
+            <p>Generated by Counter-Drone C2 Simulator Analysis System</p>
+        </div>
+    </div>
+</body>
+</html>

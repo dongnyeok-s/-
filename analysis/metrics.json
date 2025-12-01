@@ -1,0 +1,31 @@
+{
+  "experiment_count": 17,
+  "detection": {
+    "total_radar_detections": 2740,
+    "total_audio_detections": 0,
+    "total_false_alarms": 13,
+    "avg_detection_delay": 1.22,
+    "min_detection_delay": 0.8,
+    "max_detection_delay": 2.6,
+    "false_alarm_rate": 0.47
+  },
+  "engagement": {
+    "total_engage_commands": 15,
+    "avg_engagement_delay": 7.14,
+    "drones_engaged_ratio": 9.18
+  },
+  "interception": {
+    "total_attempts": 0,
+    "total_successes": 4,
+    "total_failures": 6,
+    "success_rate": 0,
+    "neutralization_rate": 4.08
+  },
+  "drones": {
+    "total": 98,
+    "hostile": 98,
+    "detected": 39,
+    "engaged": 9,
+    "neutralized": 4
+  }
+}
