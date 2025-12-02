@@ -17,6 +17,7 @@ import {
 } from '../../../shared/schemas';
 import { SimulationEngine } from '../simulation';
 import { getGenerator, ScenarioGenerator, GeneratedScenario } from '../core/scenario/generator';
+import { getConfig } from '../config';
 
 // 추가 명령 타입
 interface ManualActionCommand {
@@ -48,23 +49,26 @@ export class SimulatorWebSocketServer {
   private clients: Set<WebSocket> = new Set();
   private generator: ScenarioGenerator;
 
-  constructor(port: number = 8080) {
+  constructor(port?: number) {
+    const config = getConfig();
+    const serverPort = port ?? config.port;
+    
     // 시뮬레이션 엔진 초기화
     this.simulation = new SimulationEngine((event) => {
       this.broadcast(event);
     });
 
     // 시나리오 생성기 초기화
-    this.generator = getGenerator({}, './scenarios/generated');
+    this.generator = getGenerator({}, config.scenariosDir);
 
     // WebSocket 서버 생성
-    this.wss = new WebSocketServer({ port });
+    this.wss = new WebSocketServer({ port: serverPort });
 
     this.wss.on('connection', (ws) => {
       this.handleConnection(ws);
     });
 
-    console.log(`[Simulator] WebSocket 서버 시작: ws://localhost:${port}`);
+    console.log(`[Simulator] WebSocket 서버 시작: ws://localhost:${serverPort}`);
     
     // 기본 시나리오 로드
     this.simulation.loadScenario(1);

@@ -28,9 +28,13 @@ class AudioModelClient:
     
     def __init__(
         self,
-        server_url: str = "ws://localhost:8080",
-        detection_interval: float = 2.0,  # 탐지 주기 (초)
+        server_url: str = None,
+        detection_interval: float = None,  # 탐지 주기 (초)
     ):
+        import os
+        # 환경 변수에서 설정 로드, 없으면 기본값 사용
+        self.server_url = server_url or os.getenv('AUDIO_MODEL_WS_URL', 'ws://localhost:8080')
+        self.detection_interval = detection_interval or float(os.getenv('AUDIO_DETECTION_INTERVAL', '2.0'))
         self.server_url = server_url
         self.detection_interval = detection_interval
         self.model = DroneAudioCRNN()
@@ -165,10 +169,16 @@ class AudioModelClient:
 
 async def main():
     """메인 함수"""
+    import os
     print("=== 음향 모델 WebSocket 클라이언트 ===\n")
     
+    # 환경 변수에서 설정 로드
+    server_url = os.getenv('AUDIO_MODEL_WS_URL', 'ws://localhost:8080')
+    detection_interval = float(os.getenv('AUDIO_DETECTION_INTERVAL', '2.0'))
+    
     client = AudioModelClient(
-        server_url="ws://localhost:8080",
+        server_url=server_url,
+        detection_interval=detection_interval,
         detection_interval=2.0,
     )
     

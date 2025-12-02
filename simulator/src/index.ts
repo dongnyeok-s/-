@@ -4,8 +4,10 @@
  */
 
 import { SimulatorWebSocketServer } from './websocket/server';
+import { getConfig } from './config';
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8080;
+const config = getConfig();
+const PORT = config.port;
 
 console.log('========================================');
 console.log('  대드론 C2 시뮬레이터 서버');
@@ -27,5 +29,5 @@ process.on('SIGTERM', () => {
 });
 
 console.log('[Simulator] 서버 준비 완료');
-console.log(`[Simulator] C2 UI에서 ws://localhost:${PORT} 으로 연결하세요`);
+console.log(`[Simulator] C2 UI에서 ${config.wsUrl} 으로 연결하세요`);
 

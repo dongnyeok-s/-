@@ -47,6 +47,7 @@ import {
   EngageEndLogEvent,
   AbortReason,
 } from './core/engagement';
+import { getConfig } from './config';
 
 export class SimulationEngine {
   private world: SimulationWorld;
@@ -67,7 +68,12 @@ export class SimulationEngine {
 
   constructor(onEvent: (event: SimulatorToC2Event) => void) {
     this.onEvent = onEvent;
-    this.logger = getLogger({ logsDir: './logs', enabled: true, consoleOutput: false });
+    const config = getConfig();
+    this.logger = getLogger({ 
+      logsDir: config.logsDir, 
+      enabled: config.logEnabled, 
+      consoleOutput: config.logConsoleOutput 
+    });
     
     const basePosition: Position3D = { x: 0, y: 0, altitude: 50 };
     

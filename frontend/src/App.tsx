@@ -38,8 +38,10 @@ import {
 } from './logic/simulator';
 import { formatTime } from './utils';
 import { useWebSocket, ConnectionStatus } from './hooks/useWebSocket';
+import { getConfig } from './config';
 
-const WS_URL = 'ws://localhost:8080';
+const config = getConfig();
+const WS_URL = config.simulatorWsUrl;
 
 // 시나리오 타입
 interface ScenarioInfo {
