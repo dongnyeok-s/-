@@ -9,8 +9,8 @@ import os
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
-from loader import load_all_experiments, ExperimentData
-from metrics import calculate_all_metrics, ExperimentMetrics
+from lib.loader import load_all_experiments, ExperimentData
+from lib.metrics import calculate_all_metrics, ExperimentMetrics
 
 
 def generate_summary(experiments: List[ExperimentData]) -> Dict[str, Any]:

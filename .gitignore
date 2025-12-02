@@ -29,3 +29,15 @@ scenarios/generated/
 .env
 .env.local
 
+
+# Analysis results
+analysis/*.csv
+analysis/*.png
+analysis/*.json
+analysis/results.csv
+analysis/baseline_*.csv
+analysis/experiment_analysis*.png
+analysis/guidance_comparison.png
+
+# Keep only reports/ directory structure
+!analysis/reports/
