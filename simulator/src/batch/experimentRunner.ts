@@ -7,7 +7,7 @@
 import { SimulationEngine } from '../simulation';
 import { ScenarioGenerator, getGenerator, GeneratedScenario } from '../core/scenario/generator';
 import { ExperimentLogger, getLogger, resetLogger } from '../core/logging/logger';
-import { SimulatorToC2Event } from '../../../shared/schemas';
+import { SimulatorToC2Event, GuidanceMode } from '../../../shared/schemas';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -26,6 +26,8 @@ export interface ExperimentConfig {
   autoEngage: boolean;
   /** 위협 거리 임계값 (자동 교전 시, m) */
   engageDistanceThreshold: number;
+  /** 유도 모드 (PN 또는 PURE_PURSUIT) */
+  guidanceMode: GuidanceMode;
 }
 
 export interface ExperimentResult {
@@ -58,6 +60,7 @@ export class ExperimentRunner {
       namePrefix: config.namePrefix ?? 'exp',
       autoEngage: config.autoEngage ?? true,
       engageDistanceThreshold: config.engageDistanceThreshold ?? 300,
+      guidanceMode: config.guidanceMode ?? 'PN',  // 기본값: PN 유도
     };
   }
 
@@ -70,6 +73,7 @@ export class ExperimentRunner {
     console.log(`   실험 횟수: ${this.config.numExperiments}`);
     console.log(`   실험당 시간: ${this.config.experimentDuration}초`);
     console.log(`   자동 교전: ${this.config.autoEngage ? 'ON' : 'OFF'}`);
+    console.log(`   유도 모드: ${this.config.guidanceMode === 'PN' ? '비례 항법 (PN)' : '직선 추격'}`);
     console.log('='.repeat(60));
 
     for (let i = 0; i < this.config.numExperiments; i++) {
@@ -128,7 +132,7 @@ export class ExperimentRunner {
           counters.radarDetections++;
           // 자동 교전 로직
           if (this.config.autoEngage && event.range <= this.config.engageDistanceThreshold) {
-            simulation.handleEngageCommand(event.drone_id, undefined, 'auto');
+            simulation.handleEngageCommand(event.drone_id, undefined, 'auto', 'RAM', this.config.guidanceMode);
             counters.engageCommands++;
           }
           break;
@@ -142,6 +146,9 @@ export class ExperimentRunner {
           break;
       }
     });
+
+    // 유도 모드 설정
+    simulation.setDefaultGuidanceMode(this.config.guidanceMode);
 
     // 시나리오 로드
     simulation.loadScenario(scenario.id);
@@ -275,11 +282,17 @@ async function main() {
 🔬 대드론 C2 시뮬레이션 실험 데이터 생성기
 
 사용법:
-  npx ts-node src/batch/experimentRunner.ts [실험횟수] [실험시간(초)] [시작시드]
+  npx ts-node src/batch/experimentRunner.ts [실험횟수] [실험시간(초)] [시작시드] [유도모드]
 
 예시:
-  npx ts-node src/batch/experimentRunner.ts 10 60        # 10회 실험, 각 60초
-  npx ts-node src/batch/experimentRunner.ts 50 120 12345 # 50회 실험, 각 120초, 시드 12345
+  npx ts-node src/batch/experimentRunner.ts 10 60                 # 10회 실험, PN 유도
+  npx ts-node src/batch/experimentRunner.ts 50 120 12345          # 50회 실험, 시드 12345, PN 유도
+  npx ts-node src/batch/experimentRunner.ts 30 60 12345 PN        # 30회 실험, PN 유도
+  npx ts-node src/batch/experimentRunner.ts 30 60 12345 PURE_PURSUIT  # 30회 실험, 직선 추격
+
+유도 모드:
+  PN           - Proportional Navigation (비례 항법) - 기본값
+  PURE_PURSUIT - 직선 추격 (기존 방식)
 
 출력:
   - logs/*.jsonl    : 각 실험의 상세 이벤트 로그
@@ -288,6 +301,10 @@ async function main() {
     return;
   }
   
+  // 유도 모드 파싱
+  const guidanceModeArg = args[3]?.toUpperCase();
+  const guidanceMode: GuidanceMode = guidanceModeArg === 'PURE_PURSUIT' ? 'PURE_PURSUIT' : 'PN';
+  
   const config: Partial<ExperimentConfig> = {
     numExperiments: parseInt(args[0]) || 10,
     experimentDuration: parseInt(args[1]) || 60,
@@ -295,6 +312,7 @@ async function main() {
     namePrefix: 'batch',
     autoEngage: true,
     engageDistanceThreshold: 300,
+    guidanceMode,
   };
 
   console.log('\n🔬 대드론 C2 시뮬레이션 실험 데이터 생성기\n');

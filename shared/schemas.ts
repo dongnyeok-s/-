@@ -47,6 +47,11 @@ export type InterceptMethod =
   | 'NET'   // 그물 요격
   | 'JAM';  // 전자전 재밍
 
+/** 유도 모드 */
+export type GuidanceMode = 
+  | 'PURE_PURSUIT'  // 기존 직선 추격
+  | 'PN';           // Proportional Navigation (비례 항법)
+
 /** 교전 방법 (레거시 호환성) */
 export type EngagementMethod = 
   | 'interceptor_drone'  // 요격 드론
@@ -111,7 +116,14 @@ export interface InterceptorUpdateEvent {
   position: { x: number; y: number; altitude: number };
   distance_to_target?: number;
   method?: InterceptMethod;      // 요격 방식
+  guidance_mode?: GuidanceMode;  // 유도 모드 (PN, PURE_PURSUIT)
   eo_confirmed?: boolean;        // EO 정찰 완료 여부
+  // PN 유도 디버그 정보
+  pn_debug?: {
+    closing_speed?: number;      // 접근 속도
+    lambda_dot?: number;         // LOS 각속도
+    commanded_accel?: number;    // 명령 가속도
+  };
 }
 
 /** 요격 결과 이벤트 */

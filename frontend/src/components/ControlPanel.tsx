@@ -5,17 +5,26 @@
  */
 
 import { motion } from 'framer-motion';
-import { Gauge, Wifi, WifiOff, Settings } from 'lucide-react';
+import { Gauge, Wifi, WifiOff, Settings, Crosshair, ArrowRight } from 'lucide-react';
+import { GuidanceMode, GUIDANCE_MODE_INFO } from '../types';
 
 interface ControlPanelProps {
   speedMultiplier: number;
   onSpeedChange: (speed: number) => void;
   isConnected: boolean;
+  guidanceMode?: GuidanceMode;
+  onGuidanceModeChange?: (mode: GuidanceMode) => void;
 }
 
 const SPEED_OPTIONS = [0.5, 1, 2, 5, 10];
 
-export default function ControlPanel({ speedMultiplier, onSpeedChange, isConnected }: ControlPanelProps) {
+export default function ControlPanel({ 
+  speedMultiplier, 
+  onSpeedChange, 
+  isConnected,
+  guidanceMode = 'PN',
+  onGuidanceModeChange
+}: ControlPanelProps) {
   return (
     <div className="p-4 space-y-4">
       {/* 속도 제어 */}
@@ -43,6 +52,44 @@ export default function ControlPanel({ speedMultiplier, onSpeedChange, isConnect
             </motion.button>
           ))}
         </div>
+      </div>
+
+      {/* 유도 모드 선택 */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <Crosshair className="w-4 h-4 text-slate-400" />
+          <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+            요격 유도 모드
+          </span>
+        </div>
+        <div className="flex gap-1.5">
+          {(['PN', 'PURE_PURSUIT'] as GuidanceMode[]).map((mode) => {
+            const info = GUIDANCE_MODE_INFO[mode];
+            const isActive = guidanceMode === mode;
+            return (
+              <motion.button
+                key={mode}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => onGuidanceModeChange?.(mode)}
+                className={`flex-1 py-2 px-2 rounded text-xs font-medium transition-all flex flex-col items-center gap-1
+                           ${isActive
+                             ? mode === 'PN' 
+                               ? 'bg-cyan-500/30 text-cyan-400 border border-cyan-500/50'
+                               : 'bg-amber-500/30 text-amber-400 border border-amber-500/50'
+                             : 'bg-slate-700 text-slate-400 border border-slate-600 hover:bg-slate-600'
+                           }`}
+                title={info.description}
+              >
+                <span className="text-base">{info.icon}</span>
+                <span>{info.name}</span>
+              </motion.button>
+            );
+          })}
+        </div>
+        <p className="text-xs text-slate-500 mt-1.5">
+          {GUIDANCE_MODE_INFO[guidanceMode].description}
+        </p>
       </div>
 
       {/* 연결 상태 */}

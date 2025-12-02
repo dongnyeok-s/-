@@ -1,5 +1,5 @@
 /**
- * 요격 드론 행동 모델 (확장판)
+ * 요격 드론 행동 모델 (확장판 + PN 유도)
  * 
  * 상태:
  * - IDLE: 대기
@@ -18,6 +18,10 @@
  * - GUN: 사격 요격 (100~400m 거리)
  * - NET: 그물 요격 (<100m 거리)
  * - JAM: 전자전 재밍 (50~300m, 시간 누적)
+ * 
+ * 유도 모드:
+ * - PURE_PURSUIT: 기존 직선 추격
+ * - PN: Proportional Navigation (비례 항법)
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -37,6 +41,17 @@ import {
   EOConfirmationEvent,
 } from '../core/logging/eventSchemas';
 import { InterceptorDrone, HostileDrone, Position3D, Velocity3D } from '../types';
+import {
+  GuidanceMode,
+  PNState,
+  PNConfig,
+  DEFAULT_PN_CONFIG,
+  createInitialPNState,
+  computeGuidance,
+  computePnGuidance,
+  computePurePursuitGuidance,
+  pnStateToLog,
+} from './guidance';
 
 // ============================================
 // 확장된 요격 드론 타입
@@ -51,7 +66,14 @@ export interface ExtendedInterceptorDrone extends InterceptorDrone {
   jamDuration?: number;              // 재밍 누적 시간
   gunAttempts?: number;              // 사격 시도 횟수
   maxGunAttempts?: number;           // 최대 사격 시도
+  
+  // PN 유도 관련
+  pnState?: PNState;                 // PN 유도 상태
+  guidanceMode: GuidanceMode;        // 유도 모드 (PN 또는 PURE_PURSUIT)
 }
+
+// 유도 모드 및 PN 타입 재export
+export { GuidanceMode, PNState, PNConfig, DEFAULT_PN_CONFIG };
 
 // ============================================
 // 유틸리티 함수
@@ -84,7 +106,8 @@ function predictTargetPosition(target: HostileDrone, seconds: number): Position3
 
 export function createInterceptor(
   basePosition: Position3D,
-  config: InterceptorConfig = DEFAULT_INTERCEPTOR_CONFIG
+  config: InterceptorConfig = DEFAULT_INTERCEPTOR_CONFIG,
+  guidanceMode: GuidanceMode = 'PN'  // 기본값: PN 유도
 ): ExtendedInterceptorDrone {
   return {
     id: `INT-${uuidv4().substring(0, 4).toUpperCase()}`,
@@ -101,6 +124,8 @@ export function createInterceptor(
     jamDuration: 0,
     gunAttempts: 0,
     maxGunAttempts: 5,
+    guidanceMode,
+    pnState: createInitialPNState(guidanceMode),
   };
 }
 
@@ -111,11 +136,14 @@ export function launchInterceptor(
   interceptor: ExtendedInterceptorDrone,
   targetId: string,
   currentTime: number,
-  method: InterceptMethod = 'RAM'
+  method: InterceptMethod = 'RAM',
+  guidanceMode?: GuidanceMode  // 발진 시 유도 모드 변경 가능
 ): ExtendedInterceptorDrone {
   if (interceptor.state !== 'IDLE' && interceptor.state !== 'STANDBY') {
     return interceptor;
   }
+
+  const newGuidanceMode = guidanceMode || interceptor.guidanceMode;
 
   return {
     ...interceptor,
@@ -126,6 +154,8 @@ export function launchInterceptor(
     jamDuration: 0,
     gunAttempts: 0,
     eoConfirmed: false,
+    guidanceMode: newGuidanceMode,
+    pnState: createInitialPNState(newGuidanceMode),
   };
 }
 
@@ -510,10 +540,65 @@ function handleJamIntercept(
 }
 
 // ============================================
-// 이동 로직
+// 이동 로직 (PN 및 Pure Pursuit 지원)
 // ============================================
 
+/**
+ * 유도 모드에 따라 목표 추격
+ * - PN: Proportional Navigation (비례 항법)
+ * - PURE_PURSUIT: 기존 직선 추격
+ */
 function pursueTarget(
+  interceptor: ExtendedInterceptorDrone,
+  target: HostileDrone,
+  deltaTime: number,
+  speedMultiplier: number = 1
+): ExtendedInterceptorDrone {
+  const maxSpeed = interceptor.config.max_speed * speedMultiplier;
+  const acceleration = interceptor.config.acceleration;
+  
+  // PN 유도 모드
+  if (interceptor.guidanceMode === 'PN' && interceptor.pnState) {
+    const result = computeGuidance({
+      interceptorPos: interceptor.position,
+      interceptorVel: interceptor.velocity,
+      targetPos: target.position,
+      targetVel: target.velocity,
+      pnState: interceptor.pnState,
+      deltaTime,
+      maxSpeed,
+      acceleration,
+    });
+    
+    return {
+      ...interceptor,
+      velocity: result.velocity,
+      pnState: result.pnState,
+    };
+  }
+  
+  // Pure Pursuit (기존 방식)
+  const velocity = computePurePursuitGuidance(
+    interceptor.position,
+    interceptor.velocity,
+    target.position,
+    target.velocity,
+    deltaTime,
+    maxSpeed,
+    acceleration,
+    2.0  // 예측 시간 2초
+  );
+  
+  return {
+    ...interceptor,
+    velocity,
+  };
+}
+
+/**
+ * 기존 Pure Pursuit 로직 (레거시 호환성)
+ */
+function pursueTargetPurePursuit(
   interceptor: ExtendedInterceptorDrone,
   target: HostileDrone,
   deltaTime: number,
@@ -732,5 +817,62 @@ export function resetInterceptor(
     eoConfirmed: false,
     jamDuration: 0,
     gunAttempts: 0,
+    pnState: createInitialPNState(interceptor.guidanceMode),
+  };
+}
+
+// ============================================
+// 유도 모드 변경
+// ============================================
+
+/**
+ * 인터셉터의 유도 모드 변경
+ */
+export function setGuidanceMode(
+  interceptor: ExtendedInterceptorDrone,
+  mode: GuidanceMode
+): ExtendedInterceptorDrone {
+  return {
+    ...interceptor,
+    guidanceMode: mode,
+    pnState: createInitialPNState(mode),
+  };
+}
+
+/**
+ * PN 파라미터 조정
+ */
+export function setPNConfig(
+  interceptor: ExtendedInterceptorDrone,
+  config: Partial<PNConfig>
+): ExtendedInterceptorDrone {
+  if (!interceptor.pnState) {
+    return interceptor;
+  }
+  
+  return {
+    ...interceptor,
+    pnState: {
+      ...interceptor.pnState,
+      pnConfig: {
+        ...interceptor.pnState.pnConfig,
+        ...config,
+      },
+    },
+  };
+}
+
+/**
+ * 인터셉터의 PN 상태 로깅용 데이터 추출
+ */
+export function getInterceptorPNDebugInfo(
+  interceptor: ExtendedInterceptorDrone
+): Record<string, unknown> | null {
+  if (!interceptor.pnState) return null;
+  
+  return {
+    guidanceMode: interceptor.guidanceMode,
+    ...pnStateToLog(interceptor.pnState),
+    navConstant: interceptor.pnState.pnConfig.navConstant,
   };
 }

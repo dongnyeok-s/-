@@ -68,6 +68,11 @@ export type Classification = 'HOSTILE' | 'FRIENDLY' | 'NEUTRAL' | 'UNKNOWN';
 /** 센서 타입 */
 export type SensorType = 'RADAR' | 'AUDIO' | 'EO';
 
+/** 유도 모드 */
+export type GuidanceMode = 
+  | 'PURE_PURSUIT'  // 기존 직선 추격
+  | 'PN';           // Proportional Navigation (비례 항법)
+
 // ============================================
 // 시나리오 이벤트
 // ============================================
@@ -230,6 +235,7 @@ export interface EngageCommandEvent extends BaseEvent {
   event: 'engage_command';
   drone_id: string;
   method: InterceptMethod;  // 요격 방식
+  guidance_mode?: GuidanceMode;  // 유도 모드 (PN, PURE_PURSUIT)
   interceptor_id?: string;
   issued_by: 'user' | 'auto';
 }
@@ -279,6 +285,7 @@ export interface InterceptResultEvent extends BaseEvent {
   interceptor_id: string;
   target_id: string;
   method: InterceptMethod;            // 요격 방식
+  guidance_mode?: GuidanceMode;       // 유도 모드
   result: 'success' | 'miss' | 'evaded' | 'aborted';
   reason?: InterceptFailureReason;    // 실패 원인 (실패 시)
   engagement_duration: number;
@@ -286,6 +293,12 @@ export interface InterceptResultEvent extends BaseEvent {
   target_was_evading?: boolean;       // 타겟 회피 여부
   relative_speed_at_intercept?: number; // 요격 시점 상대속도
   neutralization_status?: NeutralizationStatus; // 무력화 상태
+  // PN 유도 분석용
+  pn_stats?: {
+    avg_closing_speed?: number;       // 평균 접근 속도
+    max_lambda_dot?: number;          // 최대 LOS 각속도
+    nav_constant?: number;            // 사용된 N 값
+  };
 }
 
 // ============================================

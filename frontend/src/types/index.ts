@@ -312,6 +312,27 @@ export const INTERCEPT_METHOD_INFO: Record<InterceptMethod, {
   JAM: { name: '재밍', icon: '📡', color: '#3b82f6', description: '전자전 무력화' },
 };
 
+/** 유도 모드 */
+export type GuidanceMode = 'PURE_PURSUIT' | 'PN';
+
+/** 유도 모드별 정보 */
+export const GUIDANCE_MODE_INFO: Record<GuidanceMode, {
+  name: string;
+  icon: string;
+  description: string;
+}> = {
+  PURE_PURSUIT: { 
+    name: '직선 추격', 
+    icon: '➡️', 
+    description: '목표를 향해 직선 이동 (기존 방식)' 
+  },
+  PN: { 
+    name: '비례 항법 (PN)', 
+    icon: '🎯', 
+    description: 'Proportional Navigation - 회피 기동에 효과적' 
+  },
+};
+
 /** 드론 타입 */
 export type DroneType = 
   | 'RECON_UAV'       // 정찰 드론
@@ -413,12 +434,20 @@ export interface Interceptor {
   distanceToTarget?: number;
   /** 요격 방식 */
   method?: InterceptMethod;
+  /** 유도 모드 */
+  guidanceMode?: GuidanceMode;
   /** EO 정찰 완료 여부 */
   eoConfirmed?: boolean;
   /** 재밍 누적 시간 */
   jamDuration?: number;
   /** 사격 시도 횟수 */
   gunAttempts?: number;
+  /** PN 디버그 정보 */
+  pnDebug?: {
+    closingSpeed?: number;
+    lambdaDot?: number;
+    commandedAccel?: number;
+  };
 }
 
 /** EO 확인 이벤트 */
@@ -446,5 +475,6 @@ export interface EngageCommandEvent {
   type: 'engage_command';
   drone_id: string;
   method: InterceptMethod;
+  guidance_mode?: GuidanceMode;
   interceptor_id?: string;
 }

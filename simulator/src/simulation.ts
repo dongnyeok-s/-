@@ -16,12 +16,21 @@ import {
   DEFAULT_HOSTILE_DRONE_CONFIG,
   HostileDroneBehavior,
   RadarDetectionEvent,
+  GuidanceMode,
 } from '../../shared/schemas';
 
 import { SimulationWorld, HostileDrone, InterceptorDrone, Position3D } from './types';
 import { RadarSensor } from './sensors/radar';
 import { createHostileDrone, updateHostileDrone, setDroneBehavior } from './models/hostileDrone';
-import { createInterceptor, updateInterceptor, launchInterceptor, resetInterceptor, ExtendedInterceptorDrone } from './models/interceptor';
+import { 
+  createInterceptor, 
+  updateInterceptor, 
+  launchInterceptor, 
+  resetInterceptor, 
+  ExtendedInterceptorDrone,
+  setGuidanceMode,
+  getInterceptorPNDebugInfo,
+} from './models/interceptor';
 import { getLogger, ExperimentLogger } from './core/logging/logger';
 import { GeneratedScenario, getGenerator } from './core/scenario/generator';
 import * as LogEvents from './core/logging/eventSchemas';
@@ -35,6 +44,7 @@ export class SimulationEngine {
   private logger: ExperimentLogger;
   private currentScenarioId: number | string = 1;
   private evadingDrones: Set<string> = new Set();  // 회피 중인 드론 추적
+  private defaultGuidanceMode: GuidanceMode = 'PN';  // 기본 유도 모드
 
   constructor(onEvent: (event: SimulatorToC2Event) => void) {
     this.onEvent = onEvent;
@@ -225,9 +235,13 @@ export class SimulationEngine {
       this.world.hostileDrones.set(droneData.id, droneWithId);
     });
 
-    // 요격기 생성
+    // 요격기 생성 (기본 유도 모드 적용)
     for (let i = 0; i < scenario.interceptor_count; i++) {
-      const interceptor = createInterceptor(this.world.basePosition, DEFAULT_INTERCEPTOR_CONFIG);
+      const interceptor = createInterceptor(
+        this.world.basePosition, 
+        DEFAULT_INTERCEPTOR_CONFIG,
+        this.defaultGuidanceMode
+      );
       this.world.interceptors.set(interceptor.id, interceptor);
     }
   }
@@ -262,8 +276,8 @@ export class SimulationEngine {
     this.world.hostileDrones.set(hostile2.id, hostile2);
     this.world.hostileDrones.set(hostile3.id, hostile3);
 
-    const int1 = createInterceptor(this.world.basePosition, DEFAULT_INTERCEPTOR_CONFIG);
-    const int2 = createInterceptor(this.world.basePosition, DEFAULT_INTERCEPTOR_CONFIG);
+    const int1 = createInterceptor(this.world.basePosition, DEFAULT_INTERCEPTOR_CONFIG, this.defaultGuidanceMode);
+    const int2 = createInterceptor(this.world.basePosition, DEFAULT_INTERCEPTOR_CONFIG, this.defaultGuidanceMode);
     
     this.world.interceptors.set(int1.id, int1);
     this.world.interceptors.set(int2.id, int2);
@@ -291,7 +305,7 @@ export class SimulationEngine {
     });
 
     for (let i = 0; i < 3; i++) {
-      const interceptor = createInterceptor(this.world.basePosition, DEFAULT_INTERCEPTOR_CONFIG);
+      const interceptor = createInterceptor(this.world.basePosition, DEFAULT_INTERCEPTOR_CONFIG, this.defaultGuidanceMode);
       this.world.interceptors.set(interceptor.id, interceptor);
     }
   }
@@ -326,7 +340,7 @@ export class SimulationEngine {
     this.world.hostileDrones.set(hostile3.id, hostile3);
 
     for (let i = 0; i < 2; i++) {
-      const interceptor = createInterceptor(this.world.basePosition, DEFAULT_INTERCEPTOR_CONFIG);
+      const interceptor = createInterceptor(this.world.basePosition, DEFAULT_INTERCEPTOR_CONFIG, this.defaultGuidanceMode);
       this.world.interceptors.set(interceptor.id, interceptor);
     }
   }
@@ -457,17 +471,27 @@ export class SimulationEngine {
       '요격 실패': 'target_lost',
       '요격 중단': 'timeout',
     };
+    
+    // PN 통계 정보
+    const pnStats = interceptor.pnState ? {
+      avg_closing_speed: interceptor.pnState.lastClosingSpeed,
+      max_lambda_dot: interceptor.pnState.lastLambdaDot,
+      nav_constant: interceptor.pnState.pnConfig.navConstant,
+    } : undefined;
+    
     this.logger.log({
       timestamp: this.world.time,
       event: 'intercept_result',
       interceptor_id: interceptor.id,
       target_id: target.id,
       method: interceptor.method || 'RAM',
+      guidance_mode: interceptor.guidanceMode,
       result: result.toLowerCase() as 'success' | 'miss' | 'evaded' | 'aborted',
       reason: reasonMap[event.details || ''] as LogEvents.InterceptFailureReason,
       engagement_duration: interceptor.launchTime 
         ? this.world.time - interceptor.launchTime 
         : 0,
+      pn_stats: pnStats,
     });
   }
 
@@ -510,6 +534,13 @@ export class SimulationEngine {
       ? this.world.hostileDrones.get(interceptor.targetId)
       : null;
 
+    // PN 디버그 정보 추출
+    const pnDebug = interceptor.pnState ? {
+      closing_speed: interceptor.pnState.lastClosingSpeed,
+      lambda_dot: interceptor.pnState.lastLambdaDot,
+      commanded_accel: interceptor.pnState.lastCommandedAccel,
+    } : undefined;
+
     const event: InterceptorUpdateEvent = {
       type: 'interceptor_update',
       timestamp: this.world.time,
@@ -524,7 +555,9 @@ export class SimulationEngine {
           )
         : undefined,
       method: interceptor.method,
+      guidance_mode: interceptor.guidanceMode,
       eo_confirmed: interceptor.eoConfirmed,
+      pn_debug: pnDebug,
     };
     this.onEvent(event);
   }
@@ -555,7 +588,8 @@ export class SimulationEngine {
     droneId: string, 
     interceptorId?: string, 
     issuedBy: 'user' | 'auto' = 'user',
-    method: LogEvents.InterceptMethod = 'RAM'
+    method: LogEvents.InterceptMethod = 'RAM',
+    guidanceMode?: GuidanceMode  // 유도 모드 지정 가능
   ): boolean {
     const target = this.world.hostileDrones.get(droneId);
     if (!target || target.isNeutralized) return false;
@@ -577,7 +611,10 @@ export class SimulationEngine {
     const state = interceptor.state;
     if (state !== 'IDLE' && state !== 'STANDBY') return false;
 
-    const launched = launchInterceptor(interceptor, droneId, this.world.time, method);
+    // 유도 모드 설정 (지정된 경우 사용, 아니면 기본값)
+    const effectiveGuidanceMode = guidanceMode || this.defaultGuidanceMode;
+    
+    const launched = launchInterceptor(interceptor, droneId, this.world.time, method, effectiveGuidanceMode);
     this.world.interceptors.set(launched.id, launched as InterceptorDrone);
 
     // 교전 명령 로깅
@@ -586,6 +623,7 @@ export class SimulationEngine {
       event: 'engage_command',
       drone_id: droneId,
       method: method,
+      guidance_mode: effectiveGuidanceMode,
       interceptor_id: launched.id,
       issued_by: issuedBy,
     });
@@ -658,5 +696,72 @@ export class SimulationEngine {
    */
   getLogger(): ExperimentLogger {
     return this.logger;
+  }
+
+  // ============================================
+  // 유도 모드 관련 API
+  // ============================================
+
+  /**
+   * 기본 유도 모드 설정
+   */
+  setDefaultGuidanceMode(mode: GuidanceMode): void {
+    this.defaultGuidanceMode = mode;
+    console.log(`[SimulationEngine] 기본 유도 모드 변경: ${mode}`);
+    
+    // 로깅
+    this.logger.log({
+      timestamp: this.world.time,
+      event: 'manual_action',
+      action: 'set_guidance_mode',
+      details: { guidance_mode: mode },
+    });
+  }
+
+  /**
+   * 현재 기본 유도 모드 반환
+   */
+  getDefaultGuidanceMode(): GuidanceMode {
+    return this.defaultGuidanceMode;
+  }
+
+  /**
+   * 특정 요격기의 유도 모드 변경
+   */
+  setInterceptorGuidanceMode(interceptorId: string, mode: GuidanceMode): boolean {
+    const interceptor = this.world.interceptors.get(interceptorId) as ExtendedInterceptorDrone;
+    if (!interceptor) return false;
+    
+    const updated = setGuidanceMode(interceptor, mode);
+    this.world.interceptors.set(interceptorId, updated as InterceptorDrone);
+    
+    console.log(`[SimulationEngine] 요격기 ${interceptorId} 유도 모드 변경: ${mode}`);
+    return true;
+  }
+
+  /**
+   * 모든 요격기 유도 모드 정보 반환
+   */
+  getInterceptorGuidanceInfo(): Array<{
+    id: string;
+    guidanceMode: GuidanceMode;
+    pnDebug?: Record<string, unknown>;
+  }> {
+    const result: Array<{
+      id: string;
+      guidanceMode: GuidanceMode;
+      pnDebug?: Record<string, unknown>;
+    }> = [];
+    
+    this.world.interceptors.forEach((interceptor, id) => {
+      const ext = interceptor as ExtendedInterceptorDrone;
+      result.push({
+        id,
+        guidanceMode: ext.guidanceMode || 'PN',
+        pnDebug: getInterceptorPNDebugInfo(ext) || undefined,
+      });
+    });
+    
+    return result;
   }
 }

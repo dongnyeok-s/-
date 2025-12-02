@@ -1,0 +1,78 @@
+{
+  "id": "gen_20013",
+  "name": "자동생성 시나리오 (1기)",
+  "seed": 20013,
+  "created_at": "2025-12-02T02:59:11.836Z",
+  "drones": [
+    {
+      "id": "DRONE-A",
+      "position": {
+        "x": -12.825204996631177,
+        "y": 693.0764282951983,
+        "altitude": 49.204023021738976
+      },
+      "velocity": {
+        "vx": 0.4271638567571916,
+        "vy": -23.08401309888162,
+        "climbRate": 0.39049573242664337
+      },
+      "behavior": "NORMAL",
+      "is_hostile": false,
+      "drone_type": "UNKNOWN",
+      "armed": false,
+      "size_class": "SMALL",
+      "recommended_method": null,
+      "config": {
+        "max_speed": 29.14979432011023,
+        "cruise_speed": 23.08796504046768,
+        "acceleration": 7.6855119010433555,
+        "turn_rate": 115.72907503461465,
+        "climb_rate": 5.087491769343615,
+        "evasion_trigger_distance": 120.49645190825686,
+        "evasion_maneuver_strength": 0.7755462555214763
+      }
+    }
+  ],
+  "interceptor_count": 2,
+  "radar_config": {
+    "scan_rate": 1.9293682060670108,
+    "max_range": 1025,
+    "radial_noise_sigma": 13.746793487807736,
+    "azimuth_noise_sigma": 2.8994673434644938,
+    "false_alarm_rate": 0.022100446135737,
+    "miss_probability": 0.08685287014581262
+  },
+  "acoustic_config": {
+    "enabled": true,
+    "detection_range": 904,
+    "takeoff_boost": 0.2700254701077938,
+    "approach_boost": 0.20127055682241918,
+    "false_alarm_rate": 0.016346758088329808,
+    "miss_probability": 0.15539388502947987
+  },
+  "behavior_distribution": {
+    "direct_attack": 0.15904407665287923,
+    "recon_loiter": 0.20144334732711194,
+    "evasive": 0.39267808469981097,
+    "random_walk": 0.24683449132019794
+  },
+  "metadata": {
+    "hostile_ratio": 0,
+    "armed_ratio": 0,
+    "avg_initial_distance": 693,
+    "difficulty_estimate": 2,
+    "drone_type_distribution": {
+      "RECON_UAV": 0,
+      "ATTACK_UAV": 0,
+      "LOITER_MUNITION": 0,
+      "CARGO_UAV": 0,
+      "CIVILIAN": 0,
+      "UNKNOWN": 1
+    },
+    "size_distribution": {
+      "SMALL": 1,
+      "MEDIUM": 0,
+      "LARGE": 0
+    }
+  }
+}

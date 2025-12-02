@@ -26,6 +26,7 @@ import {
   SimulatorEvent,
   Interceptor,
   InterceptorState,
+  GuidanceMode,
 } from './types';
 import {
   createInitialState,
@@ -65,6 +66,9 @@ function App() {
   
   // 레이더 설정 (서버에서 수신)
   const [scanRate, setScanRate] = useState(1);
+  
+  // 유도 모드 (PN vs PURE_PURSUIT)
+  const [guidanceMode, setGuidanceMode] = useState<GuidanceMode>('PN');
 
   // WebSocket 연결
   const { status: wsStatus, send, connect, disconnect } = useWebSocket({
@@ -421,6 +425,21 @@ function App() {
     setState((prev) => ({ ...prev, speedMultiplier: multiplier }));
   }, [useSimulator, send, sendManualAction, state.speedMultiplier]);
 
+  // 유도 모드 변경 (로깅 포함)
+  const handleGuidanceModeChange = useCallback((mode: GuidanceMode) => {
+    // manual_action 로깅
+    sendManualAction('guidance_mode_change', undefined, { 
+      old_mode: guidanceMode, 
+      new_mode: mode 
+    });
+    
+    if (useSimulator) {
+      send({ type: 'set_guidance_mode', guidance_mode: mode });
+    }
+    setGuidanceMode(mode);
+    addLog('SYSTEM', `유도 모드 변경: ${mode === 'PN' ? '비례 항법 (PN)' : '직선 추격'}`);
+  }, [useSimulator, send, sendManualAction, guidanceMode]);
+
   // 시뮬레이터 연결 토글 (로깅 포함)
   const toggleSimulatorConnection = useCallback(() => {
     if (wsStatus === 'connected') {
@@ -665,6 +684,8 @@ function App() {
               speedMultiplier={state.speedMultiplier}
               onSpeedChange={handleSpeedChange}
               isConnected={wsStatus === 'connected'}
+              guidanceMode={guidanceMode}
+              onGuidanceModeChange={handleGuidanceModeChange}
             />
           </div>
         </div>
