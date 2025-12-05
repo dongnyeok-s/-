@@ -1,10 +1,17 @@
-# 소부대 대드론 C2 시뮬레이터 v2.1
+# 소부대 대드론 C2 시뮬레이터 v2.2
 
 소부대 단위의 저비용 대드론(Counter-Drone) 지휘통제 시스템 시뮬레이터입니다.
 
 ## 🚀 주요 기능
 
-### v2.1 신규 기능
+### v2.2 신규 기능 (보안 및 안정성 개선)
+- **환경 변수 검증**: Zod 스키마 기반 타입 안전 검증
+- **WebSocket 에러 핸들링**: 14가지 표준 에러 코드, 자동 하트비트
+- **인증 시스템**: 토큰 기반 인증 (URL 파라미터/헤더)
+- **CORS 보호**: Origin 기반 접근 제어
+- **Rate Limiting**: DoS 공격 방지, IP별 속도 제한
+
+### v2.1 주요 기능
 - **자동 JSONL 로깅 시스템**: 모든 이벤트를 자동으로 JSONL 파일로 저장
 - **자동 시나리오 생성기**: 랜덤 변수 기반 시나리오 대량 생성 (seed 지원)
 - **레이더 UI 개선**: 정확한 중심 기준 회전 + 스캔 잔상 효과
@@ -33,6 +40,8 @@
 │
 ├── simulator/             # 시뮬레이터 서버 (Node.js + TypeScript)
 │   ├── src/
+│   │   ├── config/        # 설정 관리
+│   │   │   └── env.ts     # 환경 변수 검증 (Zod)
 │   │   ├── core/
 │   │   │   ├── logging/   # JSONL 로깅 시스템
 │   │   │   │   ├── logger.ts        # 로거 구현
@@ -42,6 +51,9 @@
 │   │   ├── models/        # 행동 모델 (적/요격 드론)
 │   │   ├── sensors/       # 센서 시뮬레이션 (레이더)
 │   │   ├── websocket/     # WebSocket 서버
+│   │   │   ├── server.ts        # WebSocket 서버
+│   │   │   ├── security.ts      # 보안 미들웨어
+│   │   │   └── errorHandler.ts  # 에러 핸들링
 │   │   └── simulation.ts  # 시뮬레이션 엔진
 │   ├── logs/              # JSONL 로그 파일 저장
 │   ├── scenarios/generated/ # 생성된 시나리오 저장
@@ -87,6 +99,54 @@ cd audio_model
 pip install -r requirements.txt
 python websocket_client.py
 ```
+
+---
+
+## 🔐 보안 설정
+
+### 환경 변수 설정
+
+1. `.env.example`을 복사하여 `.env` 파일 생성:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. 필요에 따라 보안 설정 활성화:
+   ```env
+   # 인증 활성화 (프로덕션 권장)
+   AUTH_ENABLED=true
+   AUTH_TOKEN=your-secure-token-here
+
+   # CORS 설정
+   CORS_ENABLED=true
+   CORS_ORIGIN=https://yourdomain.com
+
+   # Rate Limiting (DoS 방지)
+   RATE_LIMIT_ENABLED=true
+   RATE_LIMIT_MAX_REQUESTS=100
+   RATE_LIMIT_WINDOW_MS=60000
+   ```
+
+### 주요 보안 기능
+
+- **환경 변수 검증**: 서버 시작 시 자동 검증, 잘못된 설정 시 오류 발생
+- **토큰 인증**: URL 파라미터 또는 Authorization 헤더로 인증
+  ```javascript
+  // URL 파라미터 방식
+  const ws = new WebSocket('ws://localhost:8080?token=your-token');
+
+  // Authorization 헤더 방식
+  const ws = new WebSocket('ws://localhost:8080', {
+    headers: { 'Authorization': 'Bearer your-token' }
+  });
+  ```
+- **CORS 제어**: 허용된 도메인만 접근 가능
+- **Rate Limiting**: IP별 연결/메시지 속도 제한
+- **에러 핸들링**: 표준화된 에러 코드 및 자동 로깅
+
+### 상세 보안 가이드
+
+프로덕션 배포 및 상세 설정은 [SECURITY.md](SECURITY.md) 참조
 
 ---
 
@@ -565,3 +625,28 @@ Objective 함수는 `analysis/auto_tune.py`의 `compute_objective_score()`에서
 │   (Python/R)    │
 └─────────────────┘
 ```
+
+---
+
+## 📚 문서
+
+- **[SECURITY.md](SECURITY.md)** - 보안 설정 및 프로덕션 배포 가이드
+  - 환경 변수 검증
+  - 인증 설정 방법
+  - CORS 및 Rate Limiting 설정
+  - 에러 코드 레퍼런스
+  - 프로덕션 체크리스트
+  
+- **[CHANGELOG_SECURITY.md](CHANGELOG_SECURITY.md)** - v2.2 보안 개선 변경 로그
+  - 상세 변경 사항
+  - 마이그레이션 가이드
+  - 테스트 방법
+
+---
+
+## 🔄 버전 히스토리
+
+- **v2.2** (2025-12-05): 보안 및 안정성 개선
+- **v2.1**: 자동 로깅 및 시나리오 생성
+- **v2.0**: 센서 융합 및 평가 파이프라인
+- **v1.0**: 기본 시뮬레이션 기능
